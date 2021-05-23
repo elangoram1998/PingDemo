@@ -50,6 +50,12 @@ const accountSchema = new mongoose.Schema({
                     throw new Error('Unread message should not be less than 0');
                 }
             }
+        },
+        state: {
+            type: String,
+            default: 'Not added',
+            enum: ['added', 'Not added', 'blocked'],
+            required: true
         }
     }]
 }, { timestamps: true });

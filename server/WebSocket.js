@@ -1,5 +1,6 @@
 
 class WebSocket {
+    
     connection(socket) {
 
         console.log("websocket connected");

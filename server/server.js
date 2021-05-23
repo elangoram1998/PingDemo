@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io');
+const { v4: uuidv4 } = require('uuid');
 
 require('./mongoose');
 const WebSocket = require('./WebSocket');
 const Account = require('./models/account_collection');
+const ChatRoom = require('./models/charRoom_collection');
+const { addUser, getUser } = require('./users');
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -44,6 +47,72 @@ app.get('/search', async (req, res) => {
         }).select('username email');
         console.log(response);
         res.status(200).send(response);
+    }
+    catch (e) {
+        console.log(e);
+        res.status(400).send(e);
+    }
+});
+
+app.post('/storeId', async (req, res) => {
+    try {
+        const socket = req.body.socket;
+        const userId = req.body.userId;
+        const { error, user } = addUser({ socket, userId });
+        if (error) {
+            throw new Error(error);
+        }
+        res.status(200).send(user);
+    }
+    catch (e) {
+        res.status(400).send(e);
+    }
+});
+
+app.post('/addChat', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const myId = req.body.myId;
+        const account = await Account.findById({ _id: myId });
+        const chatRoom = new ChatRoom({
+            roomId: uuidv4()
+        });
+        console.log(chatRoom)
+        await chatRoom.save();
+        console.log(chatRoom)
+
+        account.my_chats.push({
+            userId: id,
+            roomId: chatRoom._id,
+            state: 'added'
+        });
+        await account.save();
+
+        const addedFriend = await Account.findById({ _id: id });
+        addedFriend.my_chats.push({
+            userId: myId,
+            roomId: chatRoom._id,
+            state: 'Not added'
+        });
+        await addedFriend.save();
+
+        const getSocketId = getUser(id);
+
+        global.io.to(getSocketId.socket).emit("addChat", {
+            userId: id,
+            roomId: chatRoom._id,
+            totalMessageCount: 0,
+            unReadMessageCount: 0,
+            state: 'Not added'
+        })
+
+        res.status(200).send({
+            userId: id,
+            roomId: chatRoom._id,
+            totalMessageCount: 0,
+            unReadMessageCount: 0,
+            state: 'added'
+        });
     }
     catch (e) {
         console.log(e);
