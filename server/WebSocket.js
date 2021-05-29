@@ -14,7 +14,7 @@ class WebSocket {
         socket.on('sendMessage', async ({ roomId, userId, text }) => {
             console.log(roomId + " " + userId + " " + text);
             const chatRoom = await ChatRoom.findOne({ roomId });
-            console.log(chatRoom)
+            //console.log(chatRoom)
             const messagesSize = chatRoom.messages.length;
             const message = {
                 messageCount: messagesSize + 1,

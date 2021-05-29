@@ -125,8 +125,8 @@ app.post('/addChat', async (req, res) => {
 app.get('/getMessages', async (req, res) => {
     try {
         const roomId = req.query.roomId;
-        const messages = await ChatRoom.findOne({ roomId }).select('messages');
-        res.status(200).send(messages);
+        const chatRoom = await ChatRoom.findOne({ roomId });
+        res.status(200).send(chatRoom);
     }
     catch (e) {
         res.status(400).send(e);
