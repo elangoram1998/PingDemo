@@ -83,7 +83,7 @@ app.post('/addChat', async (req, res) => {
 
         account.my_chats.push({
             userId: id,
-            roomId: chatRoom._id,
+            roomId: chatRoom.roomId,
             state: 'added'
         });
         await account.save();
@@ -91,24 +91,26 @@ app.post('/addChat', async (req, res) => {
         const addedFriend = await Account.findById({ _id: id });
         addedFriend.my_chats.push({
             userId: myId,
-            roomId: chatRoom._id,
+            roomId: chatRoom.roomId,
             state: 'Not added'
         });
         await addedFriend.save();
 
         const getSocketId = getUser(id);
 
-        global.io.to(getSocketId.socket).emit("addChat", {
-            userId: id,
-            roomId: chatRoom._id,
-            totalMessageCount: 0,
-            unReadMessageCount: 0,
-            state: 'Not added'
-        })
+        if (getSocketId) {
+            global.io.to(getSocketId.socket).emit("addChat", {
+                userId: id,
+                roomId: chatRoom.roomId,
+                totalMessageCount: 0,
+                unReadMessageCount: 0,
+                state: 'Not added'
+            })
+        }
 
         res.status(200).send({
             userId: id,
-            roomId: chatRoom._id,
+            roomId: chatRoom.roomId,
             totalMessageCount: 0,
             unReadMessageCount: 0,
             state: 'added'
@@ -116,6 +118,17 @@ app.post('/addChat', async (req, res) => {
     }
     catch (e) {
         console.log(e);
+        res.status(400).send(e);
+    }
+});
+
+app.get('/getMessages', async (req, res) => {
+    try {
+        const roomId = req.query.roomId;
+        const messages = await ChatRoom.findOne({ roomId }).select('messages');
+        res.status(200).send(messages);
+    }
+    catch (e) {
         res.status(400).send(e);
     }
 });

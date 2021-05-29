@@ -35,8 +35,10 @@ const accountSchema = new mongoose.Schema({
             ref: 'Account'
         },
         roomId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'ChatRoom'
+            type: String,
+            required: true,
+            unique: true,
+            trim: true
         },
         totalMessageCount: {
             type: Number,
