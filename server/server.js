@@ -133,6 +133,21 @@ app.get('/getMessages', async (req, res) => {
     }
 });
 
+app.post('/updateMsgHeight', async (req, res) => {
+    try {
+        const roomId = req.query.roomId;
+        const message = req.body.message;
+        const chatRoom = await ChatRoom.findOne({ roomId });
+        chatRoom.messages[message.messageCount - 1].messageHeight = message.messageHeight;
+        await chatRoom.save();
+        res.status(200).send(true);
+    }
+    catch (e) {
+        console.log(e);
+        res.status(400).send(e);
+    }
+});
+
 /*(async () => {
     const account = new Account({
         username: "selvamrat",

@@ -1,3 +1,4 @@
+const Account = require('./models/account_collection');
 const ChatRoom = require('./models/charRoom_collection');
 
 class WebSocket {
@@ -12,7 +13,6 @@ class WebSocket {
         });
 
         socket.on('sendMessage', async ({ roomId, userId, text }) => {
-            console.log(roomId + " " + userId + " " + text);
             const chatRoom = await ChatRoom.findOne({ roomId });
             //console.log(chatRoom)
             const messagesSize = chatRoom.messages.length;
@@ -23,6 +23,7 @@ class WebSocket {
             }
             chatRoom.messages.push(message);
             await chatRoom.save();
+
             global.io.to(roomId).emit('message', chatRoom.messages[messagesSize]);
         });
 
