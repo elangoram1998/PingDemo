@@ -33,6 +33,10 @@ const chatRoomSchema = new mongoose.Schema({
             default: 'unread',
             enum: ['read', 'unread']
         },
+        messageHeight: {
+            type: Number,
+            default: 0
+        },
         created_At: {
             type: Date,
             required: true,
