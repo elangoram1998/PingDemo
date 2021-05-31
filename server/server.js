@@ -148,6 +148,26 @@ app.post('/updateMsgHeight', async (req, res) => {
     }
 });
 
+app.post('/updateMsgState', async (req, res) => {
+    try {
+        const roomId = req.query.roomId;
+        const messages = req.body.messages;
+        const id = req.body.id;
+        const chatRoom = await ChatRoom.findOne({ roomId });
+        chatRoom.messages = messages;
+        await chatRoom.save();
+        const getSocketId = getUser(id);
+        if (getSocketId) {
+            global.io.to(getSocketId.socket).emit('updateReadState', messages);
+        }
+        res.status(200).send(true);
+    }
+    catch (e) {
+        console.log(e);
+        res.status(400).send(e);
+    }
+});
+
 /*(async () => {
     const account = new Account({
         username: "selvamrat",
