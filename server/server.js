@@ -168,6 +168,21 @@ app.post('/updateMsgState', async (req, res) => {
     }
 });
 
+app.get('/isOnline', async (req, res) => {
+    try {
+        const friendId = req.query.id;
+        const getUserDetails = getUser(friendId);
+        if (getUserDetails) {
+            return res.status(200).send(true);
+        }
+        res.status(200).send(false);
+    }
+    catch (e) {
+        console.log(e);
+        res.status(400).send(e);
+    }
+});
+
 /*(async () => {
     const account = new Account({
         username: "selvamrat",
