@@ -31,7 +31,7 @@ class WebSocket {
         socket.on('call', ({ id, myId, peerId }) => {
             const getUserDetails = getUser(id);
             if (getUserDetails) {
-                global.io.to(getUserDetails.socket).emit('getting-call', { myId, peerId });
+                global.io.to(getUserDetails.socket).emit('getting-call', myId, peerId);
             }
         });
 
