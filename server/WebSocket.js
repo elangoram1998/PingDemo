@@ -15,7 +15,6 @@ class WebSocket {
 
         socket.on('sendMessage', async ({ roomId, userId, text }) => {
             const chatRoom = await ChatRoom.findOne({ roomId });
-            //console.log(chatRoom)
             const messagesSize = chatRoom.messages.length;
             const message = {
                 messageCount: messagesSize + 1,
@@ -38,12 +37,15 @@ class WebSocket {
         socket.on('answer-call', ({ id, peerId }) => {
             const getUserDetails = getUser(id);
             if (getUserDetails) {
-                global.io.to(getUserDetails.socket).emit('call-picked', { peerId });
+                global.io.to(getUserDetails.socket).emit('call-picked', peerId);
             }
         });
 
         socket.on('disconnect-call', ({ id, peerId }) => {
-
+            const getUserDetails = getUser(id);
+            if (getUserDetails) {
+                global.io.to(getUserDetails.socket).emit('user-disconnected', peerId);
+            }
         });
 
         socket.on('disconnect', () => {
