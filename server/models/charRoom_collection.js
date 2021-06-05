@@ -8,6 +8,7 @@ const chatRoomSchema = new mongoose.Schema({
         trim: true
     },
     messages: [{
+        _id: false,
         messageCount: {
             type: Number,
             required: true,

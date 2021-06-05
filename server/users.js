@@ -22,7 +22,15 @@ const getUser = (id) => {
     return user;
 }
 
+const removeUser = (id) => {
+    const index = users.findIndex(user => user.socket === id);
+    if (index !== -1) {
+        return users.splice(index, 1)[0];
+    }
+}
+
 module.exports = {
     addUser,
-    getUser
+    getUser,
+    removeUser
 }
