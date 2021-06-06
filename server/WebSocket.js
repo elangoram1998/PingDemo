@@ -11,16 +11,19 @@ class WebSocket {
         socket.on('join', ({ roomId }) => {
             console.log("join event: " + roomId);
             socket.join(roomId);
-            console.log(socket.rooms);
+            console.log(socket.adapter.rooms);
         });
 
         socket.on('leave-Room', ({ roomId }) => {
             console.log("leave event " + roomId);
             socket.leave(roomId);
+            console.log(socket.adapter.rooms);
         });
 
-        socket.on('sendMessage', async ({ roomId, userId, text }) => {
+        socket.on('sendMessage', async ({ roomId, userId, text, friendId }) => {
             try {
+                console.log(text);
+                const getUserDetails = getUser(friendId);
                 const chatRoom = await ChatRoom.findOne({ roomId });
                 const messagesSize = chatRoom.messages.length;
                 const message = {
@@ -28,12 +31,13 @@ class WebSocket {
                     userId,
                     text,
                 }
-                console.log(message);
                 chatRoom.messages.push(message);
-                console.log(chatRoom);
                 await chatRoom.save();
-
-                global.io.to(roomId).emit('message', chatRoom.messages[messagesSize]);
+                console.log(socket.adapter.rooms);
+                if (getUserDetails) {
+                    global.io.to(getUserDetails.socket).emit('message', chatRoom.messages[messagesSize]);
+                }
+                global.io.to(socket.id).emit('message', chatRoom.messages[messagesSize]);
             }
             catch (e) {
                 console.log(e);
