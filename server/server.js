@@ -69,6 +69,20 @@ app.post('/storeId', async (req, res) => {
     }
 });
 
+app.post('/removeId', async (req, res) => {
+    try {
+        const socket = req.body.socket;
+        const users = removeUser(socket);
+        if (!users) {
+            throw new Error("user not found");
+        }
+        res.status(200).send(users);
+    }
+    catch (e) {
+        res.status(400).send(e);
+    }
+});
+
 app.post('/addChat', async (req, res) => {
     try {
         const id = req.body.id;
