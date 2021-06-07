@@ -22,6 +22,8 @@ global.io = socketio(server, {
 
 io.on('connection', WebSocket.connection);
 
+
+// everything completed. ready to start the main project
 app.post('/login', async (req, res) => {
     try {
         console.log(req.body);
